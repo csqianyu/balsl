@@ -11,20 +11,21 @@ cc.Class({
     },
 
     onLoad () {
+      
 
     },
 
     onBeginContact: function (contact, selfCollider, otherCollider) {
-        otherCollider.node.destroy();
         if (otherCollider.node.name == "bollSprite") {
-            
+            otherCollider.node.destroy();
             if (this.isTouchBoll == false) {
-                this.game.firstBollPositionX = otherCollider.node.x;
+              //  this.game.firstBollPositionX = otherCollider.node.x;
                 this.isTouchBoll = true;
                 this.game.isFirstBoll = true;
-                cc.instantiate(this.bollPrefab);   
+                
             }
             this.game.tampBolls ++;
+          //  cc.log("触底小球为："+this.game.tampBolls);
             if (this.game.tampBolls == this.game.allBolls) {    
                 this.game.allBolls += this.game.addBolls;
                 this.game.addBolls = 0;
@@ -34,13 +35,26 @@ cc.Class({
                 this.game.isActivity = false;
                 this.game.allBollsLabel.enabled = true;
                 this.game.allBollsLabel.getComponent(cc.Label).string = "x " + this.game.allBolls;
-                this.game.allBollsLabel.node.setPosition(cc.v2(this.game.firstBollPositionX - 40, -410));
+                this.game.firstBollPositionX = otherCollider.node.x;
+                this.game.indexBoll.node.setPosition((cc.v2(this.game.firstBollPositionX, -486)));
+                this.game.allBollsLabel.node.setPosition(cc.v2(this.game.firstBollPositionX, -451.6));
+               
             }
+
+          
         }
+
+      
     },
 
     start () {
 
+    },
+
+    update(){
+
+
+       
     },
 
 });

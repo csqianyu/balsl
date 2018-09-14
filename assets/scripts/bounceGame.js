@@ -1,3 +1,5 @@
+var pos=require("groundSprite");
+var resumed = false;
 cc.Class({
     extends: cc.Component,
 
@@ -11,7 +13,7 @@ cc.Class({
         // 第一个boll是否触底
         isFirstBoll: false,
         // 第一个触底的boll X坐标
-        firstBollPositionX: 0,
+        firstBollPositionX: 5,
         // 所有小球计数
         allBolls: 0,
         // 所有触底小球计数
@@ -71,6 +73,18 @@ cc.Class({
             default: null,
             url: cc.AudioClip,
         },
+
+        ball:{
+            default:null,
+            type:cc.Node,
+
+        },
+
+        pause_scene:{
+
+            default:null,
+            type:cc.Node,
+        },
     },
 
     onLoad () {
@@ -78,19 +92,34 @@ cc.Class({
         cc.director.getPhysicsManager().enabled = true;
         // 开启碰撞
         cc.director.getCollisionManager().enabled = true;
-
-        this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -410));
+        this.pause_scene.active = false;
+        this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -484));
         cc.log("初始化小球的位置"+this.indexBoll.node.position);
-        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -410));   
+        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -484));   
         this.ballLink.enabled = false;
         this.ground.getComponent('groundSprite').game = this;
+        var a = this.node.getChildByName('bt_pause');
+        a.on(cc.Node.EventType.TOUCH_START, function(event){
+            cc.log("节点名字a为："+a.name);
+            if (resumed) {
+                cc.director.pause();
+                this.pause_scene.active = true;
+                resumed = false;
+                cc.log("resume状态为："+resumed)
+            } 
+            else {
+                this.pause_scene.active = false;
+                cc.director.resume();
+                resumed = true;
+            } 
+        }.bind(this), this);
+
         this.initBox();
         this.allBolls = 1;
         this.level = 1;
-       
         this.node.on(cc.Node.EventType.TOUCH_START, function(event){
-          
             this.touchStart(event);
+            
         }.bind(this), this);
 
         this.node.on(cc.Node.EventType.TOUCH_MOVE, function(event){
@@ -108,11 +137,12 @@ cc.Class({
                 var newBox = cc.instantiate(this.boxPrefab);
                 this.node.addChild(newBox);
                 newBox.setPosition(-330 + i * (95 + 15), 450);
-              //  var colorArr = this.hslToRgb(this.level * 0.025, 0.5, 0.5);
-               // newBox.setColor(cc.color(colorArr[0], colorArr[1], colorArr[2]));
+                var colorArr = this.hslToRgb(this.level * 0.025, 0.75, 0.65);
+                newBox.setColor(cc.color(colorArr[0], colorArr[1], colorArr[2]));
             }
         }
 
+      
     },
     
     initBox: function () {   
@@ -126,7 +156,7 @@ cc.Class({
                 if (node.name == "boxSprite" || node.name == "lifeBox") {
                     if (node.position.y <= 450) {
                         node.y -= 100;
-                        if (node.y < -300) {
+                        if (node.y < -350) {
                             this.showGameOver();
                         }
                     }
@@ -155,8 +185,8 @@ cc.Class({
                         }
                         this.node.addChild(newBox);
                         newBox.setPosition(-330 + i * (95 + 15), 450);
-                      //  var colorArr = this.hslToRgb(this.level * 0.025, 0.5, 0.5);
-                      //  newBox.setColor(cc.color(colorArr[0], colorArr[1], colorArr[2]));
+                        var colorArr = this.hslToRgb(this.level * 0.025, 0.75, 0.65);
+                        newBox.setColor(cc.color(colorArr[0], colorArr[1], colorArr[2]));
                     }
                 }
             }
@@ -169,29 +199,36 @@ cc.Class({
     },
 
     touchStart: function (event) {
-        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -410));
+        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -484));
+        
        
     },
 
     touchMove: function(event) {
         if (this.isActivity == false) {
-          
+            var touchPos= event.touch._point;
+            var touchPos = this.node.convertToNodeSpaceAR(touchPos);
+            var bollPos=this.ball.getPosition();
+            cc.log("触点位置"+touchPos);
+            cc.log("小球位置"+this.ball.position);
+            var vec=cc.pSub(touchPos,bollPos);
+            cc.log("向量为："+vec);
+            var angle = cc.pToAngle(vec) / Math.PI * 180;
+            cc.log("旋转角度为"+angle);
+            this.ballLink.node.setRotation(90-angle);
             this.ballLink.enabled = true;
-            var touchX = event.touch._point.x;
-            this.ballLink.node.setRotation(touchX);
-            if (this.ballLink.node.rotation < 280) {
+            cc.log("setRoatation"+(90-angle));
+            if (-75 < this.ballLink.node.rotation && this.ballLink.node.rotation < 75) {
+               this.ballLink.enabled = true;
+            } else {
                 this.ballLink.enabled = false;
             }
-            if (this.ballLink.node.rotation > 440) {
-                this.ballLink.enabled = false;
-            }
-           
         }
         
     },
 
     touchEnd: function (event) {
-        if (this.isActivity == false) {
+        if (this.isActivity == false && this.ballLink.enabled == true) {
             this.ballLink.enabled = false;
             this.allBollsLabel.enabled = false;
             if (this.isBegin == false) {
@@ -201,50 +238,77 @@ cc.Class({
                 var boll = cc.instantiate(this.bollPrefab);
                 this.node.addChild(boll);
                 boll.game = this;
-                boll.setPosition(cc.v2(this.firstBollPositionX, -410));
+                boll.setPosition(cc.v2(this.firstBollPositionX, -486));
                 var boxRigidBody = boll.getComponent(cc.RigidBody);
                 var angle = -this.ballLink.node.rotation - 270;
                 var toX = Math.cos(angle * 0.017453293) * 100;
                 var toY = Math.sin(angle * 0.017453293) * 100;
-                boxRigidBody.linearVelocity = cc.v2(toX * 15, toY * 15);
+                boxRigidBody.linearVelocity = cc.v2(toX * 17, toY * 17);
             }.bind(this), 0.08, this.allBolls - 1)
             
             this.schedule(function(){
-                this.indexBoll.enabled = false;
+                this.indexBoll.enabled = true;
+                cc.log("轨迹位置为："+this.indexBoll.node.position);
                 this.isFirstBoll = false;
-            }.bind(this), 0.08 * (this.allBolls - 1), 1);
+            }.bind(this), 0.08*(this.allBolls - 1), 1);
             this.isActivity = true;
-
+    
+            indexBollP= this.indexBoll.node.getPositionX();
+            cc.log("轨迹位置为："+this.indexBollP.position());
+            this.ballLink.node.setPosition(cc.v2(this.indexBollP, -484));
         }
+
+        
+       
     },
 
     showGameOver: function () {
         cc.director.loadScene('game_over');
     },
 
+    // start(){
+    //     a.on(cc.Node.EventType.TOUCH_START, function(event){
+    //         this.pause_scene.active = true;
+            
+    //     }.bind(this), this);
+    // },
+
     update (dt) {
       
         if (this.bollDown == true) {
             this.initBox();
-        
-            if(this.isFirstBoll == true) {
-
-                this.indexBoll.enabled = true;
-                //var indexBoll=cc.instantiate(this.bollPrefab);
-                this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -410));
-                
-              /*  if(this.indexBoll.node.position!=cc.v2(this.firstBollPositionX,-410))
-                {
-                    cc.log("第一个球弹出去了！！，弹出小球的位置为"+this.indexBoll.node.position);
-                    this.indexBoll.enabled = true;
-                    this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -410));
-                    cc.log("重新设置小球的位置为："+this.indexBoll.node.position);
-                }*/
-            }
         }
         
-       
+        if(this.isFirstBoll == true) {
+           
+            this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -486));
+           // cc.log("第一个球的位置为："+ this.indexBoll.node.Position());
+            this.indexBoll.enabled = true;
+        }
     },
+    
+    hslToRgb: function (h, s, l) {
+        var r, g, b;
+        if(s == 0) {
+            r = g = b = l; // achromatic
+        } else {
+            var hue2rgb = function hue2rgb(p, q, t) {
+                if(t < 0) t += 1;
+                if(t > 1) t -= 1;
+                if(t < 1/6) return p + (q - p) * 6 * t;
+                if(t < 1/2) return q;
+                if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
 
    
 

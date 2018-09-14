@@ -55,8 +55,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 30,
-      "height": 30
+      "width": 34,
+      "height": 34
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -83,7 +83,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "16b11be4-e630-461a-a08a-6f39098b0eed"
+      "__uuid__": "510a6e9c-89ea-47d0-9176-a5f553f64bb9"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -114,7 +114,7 @@
       "x": 0,
       "y": 0
     },
-    "_radius": 15
+    "_radius": 17
   },
   {
     "__type__": "cc.RigidBody",
@@ -151,14 +151,14 @@
     "_density": 1,
     "_sensor": false,
     "_friction": 0.2,
-    "_restitution": 1,
+    "_restitution": 0,
     "body": null,
     "_offset": {
       "__type__": "cc.Vec2",
       "x": 0,
       "y": 0
     },
-    "_radius": 15
+    "_radius": 17
   },
   {
     "__type__": "46e33Lf/o1NJrSwDSrTdW6w",

@@ -27,6 +27,12 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
+
+        audio: {
+            default: null,
+            type: cc.AudioClip
+        },
+
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -34,8 +40,11 @@ cc.Class({
     // onLoad () {},
 
     start () {
+
+      var current = cc.audioEngine.play(this.audio, false, 0.5);
        // cc.director.loadScene("bounceGame");
         this.node.on(cc.Node.EventType.TOUCH_START,function(event){
+            cc.audioEngine.stop(current);
             cc.log("score text touch");
             cc.director.loadScene("bounceGame");
         }, this.node);

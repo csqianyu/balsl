@@ -18,18 +18,16 @@ cc.Class({
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad () {
 
-    start () {
-        // cc.director.loadScene("bounceGame");
-         this.node.on(cc.Node.EventType.TOUCH_START,function(event){
+        this.node.on(cc.Node.EventType.TOUCH_START,function(event){
             cc.audioEngine.playEffect(this.btnEffect);
-            cc.log("score text touch");
+            cc.log("转场景");
+            cc.director.resume();
             cc.director.loadScene("start");
          }, this.node);
-        
- 
-     },
+    },
 
+  
     // update (dt) {},
 });
