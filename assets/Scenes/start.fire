@@ -480,16 +480,16 @@
       "__uuid__": "a4397363-4bed-4887-aaa3-696c92927bb8"
     },
     "_N$pressedSprite": {
-      "__uuid__": "e9ec654c-97a2-4787-9325-e6a10375219a"
+      "__uuid__": "a4397363-4bed-4887-aaa3-696c92927bb8"
     },
     "pressedSprite": {
-      "__uuid__": "e9ec654c-97a2-4787-9325-e6a10375219a"
+      "__uuid__": "a4397363-4bed-4887-aaa3-696c92927bb8"
     },
     "_N$hoverSprite": {
-      "__uuid__": "e9ec654c-97a2-4787-9325-e6a10375219a"
+      "__uuid__": "a4397363-4bed-4887-aaa3-696c92927bb8"
     },
     "hoverSprite": {
-      "__uuid__": "e9ec654c-97a2-4787-9325-e6a10375219a"
+      "__uuid__": "a4397363-4bed-4887-aaa3-696c92927bb8"
     },
     "_N$disabledSprite": {
       "__uuid__": "29158224-f8dd-4661-a796-1ffab537140e"

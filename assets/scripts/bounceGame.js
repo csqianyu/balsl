@@ -92,27 +92,14 @@ cc.Class({
         cc.director.getPhysicsManager().enabled = true;
         // 开启碰撞
         cc.director.getCollisionManager().enabled = true;
+        cc.view.setDesignResolutionSize(800,1280,cc.ResolutionPolicy.EXACT_FIT);
         this.pause_scene.active = false;
         this.indexBoll.node.setPosition(cc.v2(this.firstBollPositionX, -484));
         cc.log("初始化小球的位置"+this.indexBoll.node.position);
-        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -484));   
+        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX-10, -487));   
         this.ballLink.enabled = false;
         this.ground.getComponent('groundSprite').game = this;
-        var a = this.node.getChildByName('bt_pause');
-        a.on(cc.Node.EventType.TOUCH_START, function(event){
-            cc.log("节点名字a为："+a.name);
-            if (resumed) {
-                cc.director.pause();
-                this.pause_scene.active = true;
-                resumed = false;
-                cc.log("resume状态为："+resumed)
-            } 
-            else {
-                this.pause_scene.active = false;
-                cc.director.resume();
-                resumed = true;
-            } 
-        }.bind(this), this);
+        
 
         this.initBox();
         this.allBolls = 1;
@@ -130,18 +117,47 @@ cc.Class({
             this.touchEnd(event);
         }.bind(this), this);
 
-        // 生成第一层小球
+        // 生成第一层
         for (var i = 0; i < 6; i++) {
             let isBox = Math.ceil(Math.random() * 10) % 2;
             if (isBox == 1) {
                 var newBox = cc.instantiate(this.boxPrefab);
                 this.node.addChild(newBox);
                 newBox.setPosition(-330 + i * (95 + 15), 450);
+                cc.log("box的名字："+newBox.name);
+                
                 var colorArr = this.hslToRgb(this.level * 0.025, 0.75, 0.65);
                 newBox.setColor(cc.color(colorArr[0], colorArr[1], colorArr[2]));
+               
             }
-        }
 
+
+        }
+        var a = this.node.getChildByName('bt_pause');
+        a.on(cc.Node.EventType.TOUCH_START, function(event){
+            cc.log("节点名字a为："+a.name);
+            if (resumed) {
+                // this.pause_scene.removeFromParent();
+                // this.node.addChild(pause_scene);
+                // cc.log("节点")
+                cc.director.pause();
+               if (this.node.name == "boxSprite" ||this.node.name == "lifeBox") {
+                newBox.opacity=0;
+                }
+                this.pause_scene.active = true;
+                resumed = false;
+                cc.log("resume状态为："+resumed);
+                this.pause_scene.zIndex=100000;
+                
+            } 
+            else {
+                this.pause_scene.active = false;
+                cc.director.resume();
+                resumed = true;
+            } 
+
+
+        }.bind(this), this);
       
     },
     
@@ -199,7 +215,7 @@ cc.Class({
     },
 
     touchStart: function (event) {
-        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX, -484));
+        this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX-10, -484));
         
        
     },
@@ -216,9 +232,11 @@ cc.Class({
             var angle = cc.pToAngle(vec) / Math.PI * 180;
             cc.log("旋转角度为"+angle);
             this.ballLink.node.setRotation(90-angle);
+            this.ball.setRotation(90-angle);
             this.ballLink.enabled = true;
-            cc.log("setRoatation"+(90-angle));
-            if (-75 < this.ballLink.node.rotation && this.ballLink.node.rotation < 75) {
+            this.ball.setRotation(90-angle);
+           // cc.log("小球setRoatation"+(90-angle));
+            if (-80 < this.ballLink.node.rotation && this.ballLink.node.rotation < 75) {
                this.ballLink.enabled = true;
             } else {
                 this.ballLink.enabled = false;
@@ -238,7 +256,7 @@ cc.Class({
                 var boll = cc.instantiate(this.bollPrefab);
                 this.node.addChild(boll);
                 boll.game = this;
-                boll.setPosition(cc.v2(this.firstBollPositionX, -486));
+                boll.setPosition(cc.v2(this.firstBollPositionX, -484));
                 var boxRigidBody = boll.getComponent(cc.RigidBody);
                 var angle = -this.ballLink.node.rotation - 270;
                 var toX = Math.cos(angle * 0.017453293) * 100;
