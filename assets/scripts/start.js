@@ -39,14 +39,26 @@ cc.Class({
         //    cc.audioEngine.stop(this.current);
         //    cc.director.loadScene("bounceGame");
         //  }, this.node);
+
+        if(cc.sys.platform === cc.sys.WECHAT_GAME) {
+            this.showWxBannerAd();
+        }
     },
 
-    start () {
-      
-        
- 
-     },
-
-
-    // update (dt) {},
+    showWxBannerAd(){
+        let winSize = wx.getSystemInfoSync();
+        let bannerAd = wx.createBannerAd({
+            adUnitId: 'adunit-7d927d7bf8b13472',
+            style: {
+                left: 0,
+                top: 0,
+                width: 350,
+            }
+        })
+        bannerAd.show()
+        bannerAd.onResize(res => {
+            bannerAd.style.top = winSize.windowHeight - bannerAd.style.realHeight;
+            bannerAd.style.left = (winSize.windowWidth - bannerAd.style.realWidth) * 0.5;
+        })
+    },
 });

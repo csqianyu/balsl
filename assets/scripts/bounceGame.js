@@ -159,6 +159,37 @@ cc.Class({
 
         }.bind(this), this);
       
+        // if(cc.sys.platform === cc.sys.WECHAT_GAME) {
+        //     this.showWxBannerAd();
+        // }
+    },
+
+
+    showWxBannerAd(){
+        let winSize = wx.getSystemInfoSync();
+        let bannerAd = wx.createBannerAd({
+            adUnitId: 'adunit-7d927d7bf8b13472',
+            style: {
+                left: 0,
+                top: 0,
+                width: 350,
+            }
+        })
+        bannerAd.show()
+        bannerAd.onResize(res => {
+            bannerAd.style.top = winSize.windowHeight - bannerAd.style.realHeight;
+            bannerAd.style.left = (winSize.windowWidth - bannerAd.style.realWidth) * 0.5;
+        })
+    },
+
+    watchWxVideoAd() {
+        let videoAd = wx.createRewardedVideoAd({
+            adUnitId: 'adunit-44fb9362d57be189'
+        })
+        
+        videoAd.load()
+        .then(() => videoAd.show())
+        .catch(err => console.log(err.errMsg))
     },
     
     initBox: function () {   
@@ -216,7 +247,10 @@ cc.Class({
 
     touchStart: function (event) {
         this.ballLink.node.setPosition(cc.v2(this.firstBollPositionX-10, -484));
-        
+        // test for wx video ad
+        // if(cc.sys.platform === cc.sys.WECHAT_GAME) {
+        //     this.watchWxVideoAd();
+        // }
        
     },
 
